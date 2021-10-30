@@ -17,7 +17,7 @@ def extraction(url):
         img = request.urlopen(req).read()
         image = Image.open(BytesIO(img))
         ary = numpy.asarray(image)
-        return embedder.extract(ary, threshold=0.95)
+        return embedder.extract(ary, threshold=0.5)
     except:
         pass
 
@@ -35,9 +35,9 @@ def processImage(filename):
     faces = extraction(imageUrl)
     
     if faces is None:
-        return
+        return None
     elif len(faces) == 0:
-        return
+        return None
     
     # float32 512 len array
     return faces[0]['embedding']

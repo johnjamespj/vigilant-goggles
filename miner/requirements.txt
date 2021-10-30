@@ -3,5 +3,7 @@ annoy
 keras-facenet
 pillow
 opencv-python-headless
+scipy
+tensorflow
 
 pyspark
