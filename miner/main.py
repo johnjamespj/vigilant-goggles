@@ -4,6 +4,7 @@ import os
 import csv
 
 from embedding import processImage
+import indexing
 
 def filterOutPeoples(line):
     return (
@@ -40,7 +41,7 @@ def saveAsCsv(humanEntitiesBackup, filePath, rowHeader):
 def extractFaceEmbeddings(humanEntities):
     return (humanEntities[0], humanEntities[1], processImage(humanEntities[1]))
 
-def runSpark():
+def runSpark(testing=True):
     sc = SparkContext()
 
     dumpPath = os.environ['DUMP']
@@ -56,16 +57,23 @@ def runSpark():
     humanEntities = humanEntities.map(parseHumanEntity)
 
     # backup the results
-    # humanEntitiesBackup = humanEntities.collect()
-    humanEntitiesBackup = humanEntities.take(1)
+    if testing:
+        humanEntitiesBackup = humanEntities.take(5)
+    else:
+        humanEntitiesBackup = humanEntities.collect()
+
     saveAsCsv(humanEntitiesBackup, dataPath + '/human_entities_backup.csv', ['id', 'url'])
 
     humanEntitiesEmbeddings = humanEntities.map(extractFaceEmbeddings).filter(lambda x: x[2] is not None)
-    # humanEntitiesEmbeddings = humanEntitiesEmbeddings.collect()
-    humanEntitiesEmbeddings = humanEntitiesEmbeddings.take(2)
+
+    if testing:
+        humanEntitiesEmbeddings = humanEntitiesEmbeddings.take(5)
+    else:
+        humanEntitiesEmbeddings = humanEntitiesEmbeddings.collect()
+
     saveAsCsv(humanEntitiesEmbeddings, dataPath + '/human_entities_embeddings.csv', ['id', 'url'])
+    embeddings = list(map(lambda x: x[2], humanEntitiesEmbeddings))
+    indexing.saveEmbeddings(dataPath + '/embeddings.bin', embeddings)
+    indexing.indexEmbeddings(dataPath + '/index.ann', embeddings, 10)
 
-    sc.stop()
-    
-
-runSpark()
+runSpark(False)
