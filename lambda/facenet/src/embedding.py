@@ -27,6 +27,12 @@ def extractFromBytes(img):
     return embedder.extract(ary, threshold=0.5)
 
 def extractEmbeddingAction(payload):
+    if 'url' not in payload:
+        return {
+            'type': 'InvalidArgumentError',
+            'message': 'url should be in the payload!'
+        }
+
     return {
         'embedding': makeEmbeddingSerializable(embeddingFromUrl(payload['url']))
     }
