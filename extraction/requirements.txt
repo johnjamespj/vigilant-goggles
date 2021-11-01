@@ -1,0 +1,7 @@
+keras-facenet
+pillow
+opencv-python-headless
+scipy
+tensorflow-cpu
+
+boto3
