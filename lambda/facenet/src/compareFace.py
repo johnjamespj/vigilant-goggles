@@ -52,7 +52,7 @@ def getComparisons(url1, url2, box):
 
         res = {
             'box': box['box'],
-            'isSameFace': face < 0.4 if 1 else 0,
+            'isSameFace': (0, 1)[face < 0.4],
             'distances': face
         }
 
@@ -67,7 +67,7 @@ def compareFaceAction(payload):
             'type': 'InvalidArgumentError',
             'message': 'url should be in the payload!'
         }
-    
+
     res = getComparisons(payload['subjectUrl'], payload['targetUrl'], payload['box'])
     return {
         'comparison': res

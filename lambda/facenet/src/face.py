@@ -12,8 +12,6 @@ def getFaces(url):
     ary = numpy.asarray(img)
     return detector.detect_faces(ary)
 
-print(getFaces("https://m.media-amazon.com/images/M/MV5BMjJkNDg5ZDctM2RlZS00NjFmLTkxZjktMWE5NGQzMDg4NDFhXkEyXkFqcGdeQXVyMTMwMDM1OTQ@._V1_.jpg"))
-
 def getFaceAction(payload):
     if 'url' not in payload:
         return {
