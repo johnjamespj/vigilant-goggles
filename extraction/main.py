@@ -6,10 +6,10 @@ from embedding import extractFromFilename
 import boto3
 
 s3resoure = boto3.resource('s3')
-bucket = s3resoure.Bucket('vg-embedding')
+bucket = s3resoure.Bucket(os.environ['bucket'])
 
 embeddingsPerObj = 5
-file = "~/data/human_entities_backup.csv.bz2"
+file = os.environ['DUMP']
 
 def saveFileToS3(buffer, name):
     bucket.upload_fileobj(buffer, name)
