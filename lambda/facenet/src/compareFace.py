@@ -52,7 +52,7 @@ def getComparisons(url1, url2, box):
 
         res = {
             'box': box['box'],
-            'isSameFace': face < 0.4,
+            'isSameFace': face < 0.4 if 1 else 0,
             'distances': face
         }
 
