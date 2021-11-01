@@ -15,7 +15,7 @@ def extraction(url):
     try:
         req = request.Request(url, headers={'User-Agent': 'Face-Indexer/1.0'})
         img = request.urlopen(req).read()
-        image = Image.open(BytesIO(img))
+        image = Image.open(BytesIO(img)).convert('RGB')
         ary = numpy.asarray(image)
         return embedder.extract(ary, threshold=0.5)
     except:
