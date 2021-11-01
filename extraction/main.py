@@ -1,15 +1,19 @@
 import bz2
 import os
 from io import BytesIO
+import csv
 
 from embedding import extractFromFilename
 import boto3
 
 s3resoure = boto3.resource('s3')
-bucket = s3resoure.Bucket(os.environ['bucket'])
+bucket = s3resoure.Bucket(os.environ['BUCKET'])
 
-embeddingsPerObj = 5
+embeddingsPerObj = int(os.environ["UNIT_COUNT"])
 file = os.environ['DUMP']
+
+def parseCSVLine(line):
+    return list(csv.reader([line]))[0]
 
 def saveFileToS3(buffer, name):
     bucket.upload_fileobj(buffer, name)
@@ -27,7 +31,7 @@ def main():
                 removedHeader = True
                 continue
             
-            line = line.decode('utf8').replace('\r\n', '').split(',')
+            line = parseCSVLine(line.decode('utf8').replace('\r\n', ''))
             line[0] = int(line[0])
             id, url = line
 
@@ -43,9 +47,10 @@ def main():
             if idx != 0 and idx % embeddingsPerObj == 0:
                 # saves to s3
                 tempObj.seek(0)
-                saveFileToS3(tempObj, '%s' % (idx -  embeddingsPerObj))
+                saveFileToS3(tempObj, 'block-%s' % idx)
                 tempObj = BytesIO()
             
+            print('(%s completed)' % (idx))
             idx += 1
 
 main()

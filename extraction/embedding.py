@@ -34,7 +34,7 @@ def extractFromFilename(filename):
     url = findImagePath(filename)
     embeddings = extraction(url)
 
-    if len(embeddings) < 1:
+    if embeddings is None or len(embeddings) < 1:
         return None
 
     return embeddings[0]['embedding']
