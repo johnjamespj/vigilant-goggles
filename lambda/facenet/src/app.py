@@ -1,7 +1,12 @@
+import time
 from embedding import extractEmbeddingAction
+from face import getFaceAction
+from compareFace import compareFaceAction
 
 actions = {
-    'extractEmbedding': extractEmbeddingAction
+    'extractEmbedding': extractEmbeddingAction,
+    'extractFaceAction': getFaceAction,
+    'compareFaces': compareFaceAction
 }
 
 def handler(event, context): 
@@ -14,4 +19,11 @@ def handler(event, context):
             'message': 'Action not in actions'
         }
 
-    return actions[action](payload)
+    start = time.process_time()
+    res = actions[action](payload)
+    timeTaken = time.process_time() - start
+
+    return {
+        'result': res,
+        'timeTaken': timeTaken
+    }

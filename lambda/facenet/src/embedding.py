@@ -1,12 +1,27 @@
-import os
 from PIL import Image
-import urllib.request as request
-from io import BytesIO
 import numpy
 from keras_facenet import FaceNet
 import base64
+from io import BytesIO
+from PIL import Image
 
-embedder = FaceNet(weights_filepath="./models/20180402-114759-weights.h5", model_download=True)
+from util import getImageFromUrl
+
+# embedder = FaceNet(weights_filepath="./models/20180402-114759-weights.h5", model_download=True)
+embedder = FaceNet()
+
+def getEmbedderExtractor():
+    return embedder
+
+def extractFromBytes(img):
+    image = Image.open(BytesIO(img))
+    image = image.convert('RGB')
+
+    ary = numpy.asarray(image)
+    return embedder.extract(ary, threshold=0.5)
+
+def extractFaceFromArray(facePixelArray):
+    return embedder.extract(facePixelArray)
 
 def makeEmbeddingSerializable(embeddings):
     for face in embeddings:
@@ -17,15 +32,6 @@ def embeddingFromUrl(url):
     img = getImageFromUrl(url)
     return extractFromBytes(img)
 
-def getImageFromUrl(url):
-    req = request.Request(url, headers={'User-Agent': 'Face-Indexer/1.0'})
-    return request.urlopen(req).read()
-
-def extractFromBytes(img):
-    image = Image.open(BytesIO(img))
-    ary = numpy.asarray(image)
-    return embedder.extract(ary, threshold=0.5)
-
 def extractEmbeddingAction(payload):
     if 'url' not in payload:
         return {
@@ -34,5 +40,5 @@ def extractEmbeddingAction(payload):
         }
 
     return {
-        'embedding': makeEmbeddingSerializable(embeddingFromUrl(payload['url']))
+        'embeddings': makeEmbeddingSerializable(embeddingFromUrl(payload['url']))
     }
