@@ -12,6 +12,14 @@ bucket = s3resoure.Bucket(os.environ['BUCKET'])
 embeddingsPerObj = int(os.environ["UNIT_COUNT"])
 file = os.environ['DUMP']
 
+start = -1
+end = -1
+try:
+    start = int(os.environ["START"])
+    end = int(os.environ["END"])
+except:
+    pass
+
 def parseCSVLine(line):
     return list(csv.reader([line]))[0]
 
@@ -31,6 +39,16 @@ def main():
                 removedHeader = True
                 continue
             
+            if start != -1 and idx < start:
+                idx += 1
+                continue
+
+            if end != -1 and idx >= end:
+                tempObj.seek(0)
+                saveFileToS3(tempObj, 'block-%s' % idx)
+                tempObj = BytesIO()
+                break
+
             line = parseCSVLine(line.decode('utf8').replace('\r\n', ''))
             line[0] = int(line[0])
             id, url = line
